@@ -1,0 +1,12 @@
+#+TITLE: Goto
+#+AUTHOR: Noah Ma
+#+EMAIL: noahstorym@gmail.com
+
+* Table of Contents                                       :TOC_5_gh:noexport:
+- [[#raco-pkg-install-goto][raco pkg install goto]]
+
+* raco pkg install goto
+
+#+begin_src racket
+(require goto)
+#+end_src
