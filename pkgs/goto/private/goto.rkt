@@ -5,10 +5,10 @@
 (struct label (k) #:property prop:procedure (struct-field-index k))
 (define (make-label [prompt-tag (default-continuation-prompt-tag)])
   (call/cc goto* prompt-tag))
-(define current-continuation
-  (case-λ
-    [() (make-label)]
-    [(l) (current-continuation l l)]
-    [(l0 l1) (l0 l1)]))
-(define (goto l0 [l1 l0]) (current-continuation l0 l1))
-(define goto* (compose1 current-continuation label))
+(define (label* . _) (make-label))
+
+(define (goto l0 [l1 l0]) (current-continuation* l1) (l0 l1))
+(define goto* (compose1 goto label))
+
+(define current-continuation* (make-parameter #f #f 'current-continuation))
+(define current-continuation (make-derived-parameter current-continuation* goto label*))
