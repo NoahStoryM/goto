@@ -16,9 +16,9 @@ This package provides @racket[label] and @racket[goto] constructs that simulate
 
 @defproc[(label? [v any/c]) boolean?]
 
-@defproc[(goto [k0 label?] [k1 label? k0]) none/c]{
+@defproc[(goto [l0 label?] [l1 label? l0]) none/c]{
 @racketblock[
-(define (goto k0 [k1 k0]) (k0 k1))
+(define (goto l0 [l1 l0]) (l0 l1))
 ]
 }
 
@@ -29,18 +29,18 @@ This package provides @racket[label] and @racket[goto] constructs that simulate
 }
 
 @defproc*[([(current-continuation) label?]
-           [(current-continuation [k0 label?] [k1 label? k0]) none/c])]{
+           [(current-continuation [l0 label?] [l1 label? l0]) none/c])]{
 @racketblock[
 (define current-continuation
   (case-λ
     [() (label)]
-    [(k) (goto k)]
-    [(k0 k1) (goto k0 k1)]))
+    [(l) (goto l)]
+    [(l0 l1) (goto l0 l1)]))
 ]
 }
 
 @defproc*[([(cc) label?]
-           [(cc [k0 label?] [k1 label? k0]) none/c])]{
+           [(cc [l0 label?] [l1 label? l0]) none/c])]{
 The @racket[cc] binding is an alias for @racket[current-continuation].
 }
 
