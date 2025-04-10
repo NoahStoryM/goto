@@ -63,16 +63,25 @@ The @racket[cc] binding is an alias for @racket[current-continuation].
 (let ([lwp-run? #f] [lwp-queue (make-queue)])
   (define (start)
     (set! lwp-run? #t)
-    (goto (dequeue! lwp-queue)))
+    (when (non-empty-queue? lwp-queue)
+      (goto (dequeue! lwp-queue))))
+  (define (pause)
+    (define first? #t)
+    (define l (label))
+    (when first?
+      (set! first? #f)
+      (enqueue! lwp-queue l)
+      (start)))
   (define-syntax-rule (lwp exp* ...)
-    (begin
-      (enqueue! lwp-queue (label))
-      (when lwp-run? exp* ... (start))))
-  (lwp (display #\h))
-  (lwp (display #\e))
-  (lwp (display #\y))
-  (lwp (display #\!))
-  (lwp (newline))
+    (let ([l (label)])
+      (cond
+        [lwp-run? exp* ... (start)]
+        [else (enqueue! lwp-queue l)])))
+  (lwp (let ([l (label)]) (pause) (display #\h) (goto l)))
+  (lwp (let ([l (label)]) (pause) (display #\e) (goto l)))
+  (lwp (let ([l (label)]) (pause) (display #\y) (goto l)))
+  (lwp (let ([l (label)]) (pause) (display #\!) (goto l)))
+  (lwp (let ([l (label)]) (pause) (newline)     (goto l)))
   (start))
 ]
 
