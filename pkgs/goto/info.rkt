@@ -7,7 +7,7 @@
 (define pkg-desc "Goto based on call/cc")
 
 (define deps '("base"))
-(define build-deps '("scribble-lib" "racket-doc"))
+(define build-deps '("scribble-lib" "racket-doc" "data-doc"))
 
 (define scribblings '(("scribblings/goto.scrbl")))
 

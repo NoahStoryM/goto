@@ -1,6 +1,6 @@
 #lang scribble/manual
 
-@(require (for-label racket/base racket/contract/base goto))
+@(require (for-label racket/base racket/contract/base data/queue goto))
 
 @title{Goto}
 @defmodule[goto       #:packages ("goto")]
