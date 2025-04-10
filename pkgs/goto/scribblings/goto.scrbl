@@ -1,6 +1,6 @@
 #lang scribble/manual
 
-@(require (for-label racket/base racket/contract/base goto))
+@(require (for-label racket/base racket/contract/base data/queue goto))
 
 @title{Goto}
 @defmodule[goto       #:packages ("goto")]
@@ -54,6 +54,35 @@ The @racket[cc] binding is an alias for @racket[current-continuation].
   (set! x (add1 x))
   (when (< x 7) (goto loop))
   (displayln x))
+]
+
+@subsection{Light-Weight Process}
+
+@racketblock[
+(require data/queue)
+(let ([lwp-run? #f] [lwp-queue (make-queue)])
+  (define (start)
+    (set! lwp-run? #t)
+    (when (non-empty-queue? lwp-queue)
+      (goto (dequeue! lwp-queue))))
+  (define (pause)
+    (define first? #t)
+    (define l (label))
+    (when first?
+      (set! first? #f)
+      (enqueue! lwp-queue l)
+      (start)))
+  (define-syntax-rule (lwp exp* ...)
+    (let ([l (label)])
+      (cond
+        [lwp-run? exp* ... (start)]
+        [else (enqueue! lwp-queue l)])))
+  (lwp (let ([l (label)]) (pause) (display #\h) (goto l)))
+  (lwp (let ([l (label)]) (pause) (display #\e) (goto l)))
+  (lwp (let ([l (label)]) (pause) (display #\y) (goto l)))
+  (lwp (let ([l (label)]) (pause) (display #\!) (goto l)))
+  (lwp (let ([l (label)]) (pause) (newline)     (goto l)))
+  (start))
 ]
 
 @subsection{Yin-Yang Puzzle}
