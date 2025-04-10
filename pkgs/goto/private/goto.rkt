@@ -9,6 +9,6 @@
   (case-λ
     [() (make-label)]
     [(l) (current-continuation l l)]
-    [(l0 l1) (l0 l1)]))
-(define (goto l0 [l1 l0]) (current-continuation l0 l1))
+    [(l p) (if (label? p) (l p) (call-in-continuation (label-k l) p))]))
+(define (goto l [p l]) (current-continuation l p))
 (define goto* (compose1 current-continuation label))
