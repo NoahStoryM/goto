@@ -44,7 +44,7 @@ This package provides @racket[label] and @racket[goto] constructs that simulate
 }
 
 @defproc*[([(cc) label?]
-           [(cc [l0 label?] [p (or/c label? (-> label?)) l]) none/c])]{
+           [(cc [l label?] [p (or/c label? (-> label?)) l]) none/c])]{
 The @racket[cc] binding is an alias for @racket[current-continuation].
 }
 
