@@ -66,7 +66,6 @@ The @racket[cc] binding is an alias for @racket[current-continuation].
 (require data/queue)
 (let ([lwp-run? #f] [lwp-queue (make-queue)])
   (define (start)
-    (set! lwp-run? #t)
     (when (non-empty-queue? lwp-queue)
       (goto (dequeue! lwp-queue))))
   (define (pause)
@@ -76,16 +75,17 @@ The @racket[cc] binding is an alias for @racket[current-continuation].
       (set! first? #f)
       (enqueue! lwp-queue l)
       (start)))
-  (define-syntax-rule (lwp exp* ...)
-    (let ([l (label)])
-      (cond
-        [lwp-run? exp* ... (start)]
-        [else (enqueue! lwp-queue l)])))
-  (lwp (let ([l (label)]) (pause) (display #\h) (goto l)))
-  (lwp (let ([l (label)]) (pause) (display #\e) (goto l)))
-  (lwp (let ([l (label)]) (pause) (display #\y) (goto l)))
-  (lwp (let ([l (label)]) (pause) (display #\!) (goto l)))
-  (lwp (let ([l (label)]) (pause) (newline)     (goto l)))
+  (define (lwp thk)
+    (define l (label))
+    (cond
+      [lwp-run? (thk) (start)]
+      [else (enqueue! lwp-queue l)]))
+  (lwp (λ () (define l (label)) (pause) (display #\h) (goto l)))
+  (lwp (λ () (define l (label)) (pause) (display #\e) (goto l)))
+  (lwp (λ () (define l (label)) (pause) (display #\y) (goto l)))
+  (lwp (λ () (define l (label)) (pause) (display #\!) (goto l)))
+  (lwp (λ () (define l (label)) (pause) (newline)     (goto l)))
+  (set! lwp-run? #t)
   (start))
 ]
 
