@@ -56,6 +56,26 @@ The @racket[cc] binding is an alias for @racket[current-continuation].
   (displayln x))
 ]
 
+@subsection{Light-Weight Process}
+
+@racketblock[
+(require data/queue)
+(let ([lwp-run? #f] [lwp-queue (make-queue)])
+  (define (start)
+    (set! lwp-run? #t)
+    (goto (dequeue! lwp-queue)))
+  (define-syntax-rule (lwp exp* ...)
+    (begin
+      (enqueue! lwp-queue (label))
+      (when lwp-run? exp* ... (start))))
+  (lwp (display #\h))
+  (lwp (display #\e))
+  (lwp (display #\y))
+  (lwp (display #\!))
+  (lwp (newline))
+  (start))
+]
+
 @subsection{Yin-Yang Puzzle}
 
 @racketblock[
