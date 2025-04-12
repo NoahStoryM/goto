@@ -75,11 +75,11 @@ The @racket[cc] binding is an alias for @racket[current-continuation].
     (cond
       [lwp-run? (thk) (start)]
       [else (enqueue! lwp-queue l)]))
-  (lwp (λ () (define l (label)) (pause) (display #\h) (goto l)))
-  (lwp (λ () (define l (label)) (pause) (display #\e) (goto l)))
-  (lwp (λ () (define l (label)) (pause) (display #\y) (goto l)))
-  (lwp (λ () (define l (label)) (pause) (display #\!) (goto l)))
-  (lwp (λ () (define l (label)) (pause) (newline)     (goto l)))
+  (lwp (λ () (goto (begin0 (label) (pause) (display #\h)))))
+  (lwp (λ () (goto (begin0 (label) (pause) (display #\e)))))
+  (lwp (λ () (goto (begin0 (label) (pause) (display #\y)))))
+  (lwp (λ () (goto (begin0 (label) (pause) (display #\!)))))
+  (lwp (λ () (goto (begin0 (label) (pause) (newline)    ))))
   (set! lwp-run? #t)
   (start))
 ]
@@ -87,9 +87,6 @@ The @racket[cc] binding is an alias for @racket[current-continuation].
 @subsection{Yin-Yang Puzzle}
 
 @racketblock[
-(let ([yin (label)])
-  (display #\@)
-  (let ([yang (label)])
-    (display #\*)
-    (goto yin yang)))
+(cc (begin0 (cc) (display #\@))
+    (begin0 (cc) (display #\*)))
 ]
