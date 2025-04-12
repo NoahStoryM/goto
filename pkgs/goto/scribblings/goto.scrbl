@@ -87,6 +87,14 @@ The @racket[cc] binding is an alias for @racket[current-continuation].
 @subsection{Yin-Yang Puzzle}
 
 @racketblock[
+(let ([yin (label)])
+  (display #\@)
+  (let ([yang (label)])
+    (display #\*)
+    (goto yin yang)))
+]
+
+@racketblock[
 (cc (begin0 (cc) (display #\@))
     (begin0 (cc) (display #\*)))
 ]
