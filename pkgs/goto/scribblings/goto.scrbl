@@ -10,7 +10,7 @@
 @section{Overview}
 
 This package provides @racket[label] and @racket[goto] constructs that simulate
-@deftech{goto} using @racket[call/cc].
+@deftech{jump} using @racket[call/cc].
 
 @section{API Reference}
 
