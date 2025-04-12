@@ -1,11 +1,10 @@
 #lang racket/base
 
-(require racket/contract/base
-         (only-in "private/goto.rkt" label?))
+(require racket/contract/base)
 (require (contract-in "private/goto.rkt"
-                      [label (->* () (continuation-prompt-tag?) label?)]
-                      [goto (->* (label?) ((or/c label? (-> label?))) none/c)]
-                      [current-continuation (case-> (-> label?)
-                                                    (-> label? none/c)
-                                                    (-> label? (or/c label? (-> label?)) none/c))]))
-(provide label? label goto current-continuation (rename-out [current-continuation cc]))
+                      [label (->* () (continuation-prompt-tag?) continuation?)]
+                      [goto (->* (continuation?) (continuation?) none/c)]
+                      [current-continuation (case-> (-> continuation?)
+                                                    (-> continuation? none/c)
+                                                    (-> continuation? continuation? none/c))]))
+(provide label goto current-continuation (rename-out [current-continuation cc]))
