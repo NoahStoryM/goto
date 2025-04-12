@@ -95,6 +95,6 @@ The @racket[cc] binding is an alias for @racket[current-continuation].
 ]
 
 @racketblock[
-(cc (begin0 (cc) (display #\@))
-    (begin0 (cc) (display #\*)))
+((begin0 (cc) (display #\@))
+ (begin0 (cc) (display #\*)))
 ]
