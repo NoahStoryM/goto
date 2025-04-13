@@ -59,28 +59,28 @@ The @racket[cc] binding is an alias for @racket[current-continuation].
 
 @racketblock[
 (require data/queue)
-(let ([lwp-run? #f] [lwp-queue (make-queue)])
+(let ([lwp-queue (make-queue)])
   (define (start)
     (when (non-empty-queue? lwp-queue)
       (goto (dequeue! lwp-queue))))
-  (define (pause)
+  (define (lwp-enqueue! break continue)
     (define first? #t)
     (define l (label))
-    (when first?
-      (set! first? #f)
-      (enqueue! lwp-queue l)
-      (start)))
-  (define (lwp thk)
-    (define l (label))
     (cond
-      [lwp-run? (thk) (start)]
-      [else (enqueue! lwp-queue l)]))
+      [first?
+       (set! first? #f)
+       (enqueue! lwp-queue l)
+       (break)]
+      [else (continue)]))
+  (define (pause) (lwp-enqueue! start void))
+  (define (lwp thk) (lwp-enqueue! void (λ () (thk) (start))))
+
   (lwp (λ () (goto (begin0 (label) (pause) (display #\h)))))
   (lwp (λ () (goto (begin0 (label) (pause) (display #\e)))))
   (lwp (λ () (goto (begin0 (label) (pause) (display #\y)))))
   (lwp (λ () (goto (begin0 (label) (pause) (display #\!)))))
   (lwp (λ () (goto (begin0 (label) (pause) (newline)    ))))
-  (set! lwp-run? #t)
+
   (start))
 ]
 
