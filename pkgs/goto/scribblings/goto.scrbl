@@ -106,19 +106,17 @@ The @racket[cc] binding is an alias for @racket[current-continuation].
 @subsection{Ambiguous Operator}
 
 @racketblock[
-(require racket/sequence data/queue)
-
-(define amb-tasks (make-queue))
+(define task* '())
 (define (fail)
-  (if (queue-empty? amb-tasks)
+  (if (null? task*)
       (error "Amb tree exhausted")
-      (goto (sequence-ref amb-tasks 0))))
+      (goto (car task*))))
 (define (amb* . alt*)
   (let* ([alts alt*] [task (label)])
     (when (eq? alts alt*)
-      (enqueue-front! amb-tasks task))
+      (set! task* (cons task task*)))
     (when (null? alts)
-      (dequeue! amb-tasks)
+      (set! task* (cdr task*))
       (fail))
     (define alt (car alts))
     (set! alts (cdr alts))
