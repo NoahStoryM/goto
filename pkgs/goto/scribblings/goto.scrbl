@@ -114,18 +114,15 @@ The @racket[cc] binding is an alias for @racket[current-continuation].
       (error "Amb tree exhausted")
       (goto (sequence-ref amb-tasks 0))))
 (define (amb* . alt*)
-  (if (null? alt*)
-      (fail)
-      (let* ([alts alt*] [task (label)])
-        (cond
-          [(eq? alts alt*)
-           (enqueue-front! amb-tasks task)]
-          [(null? alts)
-           (dequeue! amb-tasks)
-           (fail)])
-        (define alt (car alts))
-        (set! alts (cdr alts))
-        (alt))))
+  (let* ([alts alt*] [task (label)])
+    (when (eq? alts alt*)
+      (enqueue-front! amb-tasks task))
+    (when (null? alts)
+      (dequeue! amb-tasks)
+      (fail))
+    (define alt (car alts))
+    (set! alts (cdr alts))
+    (alt)))
 (define-syntax-rule (amb exp* ...) (amb* (λ () exp*) ...))
 
 (let ([w-1 (amb "the" "that" "a")]
