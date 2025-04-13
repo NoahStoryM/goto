@@ -70,8 +70,8 @@ The @racket[cc] binding is an alias for @racket[current-continuation].
 ]
 
 @racketblock[
-((begin0 (cc) (display #\@))
- (begin0 (cc) (display #\*)))
+(goto (begin0 (label) (display #\@))
+      (begin0 (label) (display #\*)))
 ]
 
 @subsection{Light-Weight Process}
