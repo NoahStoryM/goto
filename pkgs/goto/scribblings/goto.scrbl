@@ -55,6 +55,21 @@ The @racket[cc] binding is an alias for @racket[current-continuation].
   (displayln x))
 ]
 
+@subsection{Yin-Yang Puzzle}
+
+@racketblock[
+(let ([yin (label)])
+  (display #\@)
+  (let ([yang (label)])
+    (display #\*)
+    (goto yin yang)))
+]
+
+@racketblock[
+((begin0 (cc) (display #\@))
+ (begin0 (cc) (display #\*)))
+]
+
 @subsection{Light-Weight Process}
 
 @racketblock[
@@ -74,27 +89,10 @@ The @racket[cc] binding is an alias for @racket[current-continuation].
       [else (continue)]))
   (define (pause) (lwp-enqueue! start void))
   (define (lwp thk) (lwp-enqueue! void (λ () (thk) (start))))
-
   (lwp (λ () (goto (begin0 (label) (pause) (display #\h)))))
   (lwp (λ () (goto (begin0 (label) (pause) (display #\e)))))
   (lwp (λ () (goto (begin0 (label) (pause) (display #\y)))))
   (lwp (λ () (goto (begin0 (label) (pause) (display #\!)))))
   (lwp (λ () (goto (begin0 (label) (pause) (newline)    ))))
-
   (start))
-]
-
-@subsection{Yin-Yang Puzzle}
-
-@racketblock[
-(let ([yin (label)])
-  (display #\@)
-  (let ([yang (label)])
-    (display #\*)
-    (goto yin yang)))
-]
-
-@racketblock[
-((begin0 (cc) (display #\@))
- (begin0 (cc) (display #\*)))
 ]
