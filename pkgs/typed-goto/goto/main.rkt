@@ -1,7 +1,6 @@
 #lang typed/racket/base
 
-(define-type Label (→ Label Nothing))
-(require typed/racket/unsafe)
+(require typed/racket/unsafe "private/types.rkt")
 (unsafe-require/typed/provide goto/private/goto
   [label (→* () (Prompt-TagTop) Label)]
   [goto (→* (Label) (Label) Nothing)]

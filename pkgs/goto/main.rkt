@@ -1,7 +1,7 @@
 #lang racket/base
 
 (require racket/contract/base)
-(require (contract-in "private/goto.rkt"
+(require (contract-in "unsafe.rkt"
                       [label (->* () (continuation-prompt-tag?) continuation?)]
                       [goto (->* (continuation?) (continuation?) none/c)]
                       [current-continuation (case-> (-> continuation?)
