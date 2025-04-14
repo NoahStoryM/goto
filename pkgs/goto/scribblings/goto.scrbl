@@ -114,14 +114,14 @@ The @racket[cc] binding is an alias for @racket[current-continuation].
 (define (amb* . alt*)
   (define first? #t)
   (define task (label))
+  (when (null? alt*) (fail))
   (when first?
     (set! first? #f)
     (set! task* (cons task task*)))
-  (when (null? alt*)
-    (set! task* (cdr task*))
-    (fail))
   (define alt (car alt*))
   (set! alt* (cdr alt*))
+  (when (null? alt*)
+    (set! task* (cdr task*)))
   (alt))
 (define-syntax-rule (amb exp* ...) (amb* (λ () exp*) ...))
 
