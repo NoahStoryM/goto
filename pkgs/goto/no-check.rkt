@@ -1,4 +1,12 @@
 #lang racket/base
 
-(require "no-check/main.rkt")
-(provide (all-from-out "no-check/main.rkt"))
+(provide label goto current-continuation (rename-out [current-continuation cc]))
+
+(define (label [prompt-tag (default-continuation-prompt-tag)])
+  (call/cc values prompt-tag))
+(define (goto k [l k]) (k l))
+(define current-continuation
+  (case-λ
+    [() (let/cc k k)]
+    [(k) (k k)]
+    [(k l) (k l)]))
