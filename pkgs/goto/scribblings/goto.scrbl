@@ -20,7 +20,7 @@ This package provides @racket[label] and @racket[goto] constructs that simulate
 
 @defproc[(goto [k continuation?]) none/c]{
 @racketblock[
-(define (goto) (k k))
+(define (goto k) (k k))
 ]
 }
 
