@@ -18,9 +18,9 @@ This package provides @racket[label] and @racket[goto] constructs that simulate
 
 @section{API Reference}
 
-@defproc[(goto [k continuation?] [l continuation? k]) none/c]{
+@defproc[(goto [k continuation?]) none/c]{
 @racketblock[
-(define (goto k [l k]) (k l))
+(define (goto) (k k))
 ]
 }
 
@@ -32,18 +32,17 @@ This package provides @racket[label] and @racket[goto] constructs that simulate
 }
 
 @defproc*[([(current-continuation) continuation?]
-           [(current-continuation [k continuation?] [l continuation? k]) none/c])]{
+           [(current-continuation [k continuation?]) none/c])]{
 @racketblock[
 (define current-continuation
   (case-λ
     [() (label)]
-    [(k) (goto k)]
-    [(k l) (goto k l)]))
+    [(k) (goto k)]))
 ]
 }
 
 @defproc*[([(cc) continuation?]
-           [(cc [k continuation?] [l continuation? k]) none/c])]{
+           [(cc [k continuation?]) none/c])]{
 The @racket[cc] binding is an alias for @racket[current-continuation].
 }
 
@@ -62,16 +61,27 @@ The @racket[cc] binding is an alias for @racket[current-continuation].
 @subsection{Yin-Yang Puzzle}
 
 @racketblock[
-(let ([yin (label)])
+(let ([yin (current-continuation)])
   (display #\@)
-  (let ([yang (label)])
+  (let ([yang (current-continuation)])
     (display #\*)
-    (goto yin yang)))
+    (yin yang)))
 ]
 
 @racketblock[
-(goto (begin0 (label) (display #\@))
-      (begin0 (label) (display #\*)))
+((begin0 (cc) (display #\@))
+ (begin0 (cc) (display #\*)))
+]
+
+@subsection{Call with Current Continuation}
+
+@racketblock[
+(define (call/cc proc)
+  (define first? #t)
+  (define l (call-with-values cc list))
+  (cond
+    [first? (set! first? #f) (proc (car l))]
+    [else (apply values l)]))
 ]
 
 @subsection{Light-Weight Process}

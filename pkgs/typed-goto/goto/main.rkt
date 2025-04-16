@@ -2,7 +2,7 @@
 
 (require typed/racket/unsafe "private/types.rkt")
 (unsafe-require/typed/provide goto/no-check
-  [label (→* () (Prompt-TagTop) Label)]
-  [goto (→* (Label) (Label) Nothing)]
-  [current-continuation (case→ (→ Label) (→* (Label) (Label) Nothing))])
+  [label (∀ (a ...) (→* () (Prompt-TagTop) (→ a ... Nothing)))]
+  [goto (→ Label Nothing)]
+  [current-continuation (∀ (a ...) (case→ (→ (→ a ... Nothing)) (→ Label Nothing)))])
 (provide Label (rename-out [current-continuation cc]))
