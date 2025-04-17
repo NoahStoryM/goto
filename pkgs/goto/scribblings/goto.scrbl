@@ -20,12 +20,16 @@ This package provides @racket[label] and @racket[goto] constructs that simulate
 @section{API Reference}
 
 @defproc[(goto [k continuation?]) none/c]{
+Sets current continuation.
+
 @racketblock[
 (define (goto k) (k k))
 ]
 }
 
 @defproc[(label [prompt-tag continuation-prompt-tag? (default-continuation-prompt-tag)]) continuation?]{
+Gets current continuation.
+
 @racketblock[
 (define (label [prompt-tag (default-continuation-prompt-tag)])
   (call/cc goto prompt-tag))
