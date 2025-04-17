@@ -1,4 +1,5 @@
 #lang typed/racket/base
 
-(provide Label)
-(define-type Label (→ Label Nothing))
+(define-type (Goto a) (∪ a (→ a Nothing)))
+(define-type Label (Goto Label))
+(provide Goto Label)
