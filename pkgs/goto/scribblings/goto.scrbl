@@ -94,9 +94,9 @@ The fixed point of @racket[Goto].
 (define (call/cc proc)
   (define first? #t)
   (define l (call-with-values cc list))
-  (cond
-    [first? (set! first? #f) (proc (car l))]
-    [else (apply values l)]))
+  (case first?
+    [(#t) (set! first? #f) (proc (car l))]
+    [(#f) (apply values l)]))
 ]
 
 @subsection{Light-Weight Process}
@@ -111,12 +111,12 @@ The fixed point of @racket[Goto].
   (define (lwp-enqueue! break continue)
     (define first? #t)
     (define l (label))
-    (cond
-      [first?
+    (case first?
+      [(#t)
        (set! first? #f)
        (enqueue! lwp-queue l)
        (break)]
-      [else (continue)]))
+      [(#f) (continue)]))
   (define (pause) (lwp-enqueue! start void))
   (define (lwp thk) (lwp-enqueue! void (λ () (thk) (start))))
 
