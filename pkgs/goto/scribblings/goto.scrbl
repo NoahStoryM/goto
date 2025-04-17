@@ -4,7 +4,8 @@
                      racket/contract/base
                      racket/sequence
                      data/queue
-                     goto))
+                     goto)
+          "utils.rkt")
 
 @title{Goto}
 @defmodule[goto       #:packages ("goto")]
@@ -44,6 +45,20 @@ This package provides @racket[label] and @racket[goto] constructs that simulate
 @defproc*[([(cc) continuation?]
            [(cc [k continuation?]) none/c])]{
 The @racket[cc] binding is an alias for @racket[current-continuation].
+}
+
+@deftypeconstr[(Goto a)]{
+@racketblock[
+(define-type (Goto a) (∪ a (→ a Nothing)))
+]
+}
+
+@deftype[Label]{
+The fixed point of @racket[Goto].
+
+@racketblock[
+(define-type Label (Goto Label))
+]
 }
 
 @section{Examples}
