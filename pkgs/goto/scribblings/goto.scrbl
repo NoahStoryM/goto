@@ -3,6 +3,7 @@
 @(require (for-label racket/base
                      racket/case
                      racket/contract/base
+                     racket/function
                      racket/sequence
                      data/queue
                      goto)
@@ -98,10 +99,10 @@ Is the fixed point of @racket[Goto].
 @racketblock[
 (define (call/cc proc)
   (define tag 0)
-  (define l (call-with-values cc list))
+  (define k (call-with-values cc const*))
   (case/eq tag
-    [(0) (set! tag 1) (proc (car l))]
-    [(1) (apply values l)]))
+    [(0) (set! tag 1) (call-with-values k proc)]
+    [(1) (k)]))
 ]
 
 @subsection{Light-Weight Process}
