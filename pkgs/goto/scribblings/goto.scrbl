@@ -101,7 +101,7 @@ Is the fixed point of @racket[Goto].
   (define tag 0)
   (define k (call-with-values cc const*))
   (case/eq tag
-    [(0) (set! tag 1) (call-with-values k proc)]
+    [(0) (set! tag 1) (proc (k))]
     [(1) (k)]))
 ]
 
