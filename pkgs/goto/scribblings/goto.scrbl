@@ -1,6 +1,7 @@
 #lang scribble/manual
 
 @(require (for-label racket/base
+                     racket/case
                      racket/contract/base
                      racket/sequence
                      data/queue
@@ -58,7 +59,7 @@ The @racket[cc] binding is an alias for @racket[current-continuation].
 }
 
 @deftype[Label]{
-The fixed point of @racket[Goto].
+Is the fixed point of @racket[Goto].
 
 @racketblock[
 (define-type Label (Goto Label))
@@ -96,18 +97,16 @@ The fixed point of @racket[Goto].
 
 @racketblock[
 (define (call/cc proc)
-  (define first? #t)
+  (define tag 0)
   (define l (call-with-values cc list))
-  (case first?
-    [(#t) (set! first? #f) (proc (car l))]
-    [(#f) (apply values l)]))
+  (case/eq tag
+    [(0) (set! tag 1) (proc (car l))]
+    [(1) (apply values l)]))
 ]
 
 @subsection{Light-Weight Process}
 
 @racketblock[
-(require data/queue)
-
 (let ([lwp-queue (make-queue)])
   (define (start)
     (when (non-empty-queue? lwp-queue)
@@ -115,7 +114,7 @@ The fixed point of @racket[Goto].
   (define (lwp-enqueue! break continue)
     (define first? #t)
     (define l (label))
-    (case first?
+    (case/eq first?
       [(#t)
        (set! first? #f)
        (enqueue! lwp-queue l)
@@ -135,35 +134,35 @@ The fixed point of @racket[Goto].
 @subsection{Ambiguous Operator}
 
 @racketblock[
-(define task* '())
-(define (fail)
-  (if (null? task*)
-      (error "Amb tree exhausted")
-      (goto (car task*))))
-(define (amb* . alt*)
-  (define first? #t)
-  (define task (label))
-  (when (null? alt*) (fail))
-  (when first?
-    (set! first? #f)
-    (set! task* (cons task task*)))
-  (define alt (car alt*))
-  (set! alt* (cdr alt*))
-  (when (null? alt*)
-    (set! task* (cdr task*)))
-  (alt))
-(define-syntax-rule (amb exp* ...) (amb* (λ () exp*) ...))
+(let ([task* '()])
+  (define (fail)
+    (if (null? task*)
+        (error "Amb tree exhausted")
+        (goto (car task*))))
+  (define (amb* . alt*)
+    (define first? #t)
+    (define task (label))
+    (when (null? alt*) (fail))
+    (when first?
+      (set! first? #f)
+      (set! task* (cons task task*)))
+    (define alt (car alt*))
+    (set! alt* (cdr alt*))
+    (when (null? alt*)
+      (set! task* (cdr task*)))
+    (alt))
+  (define-syntax-rule (amb exp* ...) (amb* (λ () exp*) ...))
 
-(let ([w-1 (amb "the" "that" "a")]
-      [w-2 (amb "frog" "elephant" "thing")]
-      [w-3 (amb "walked" "treaded" "grows")]
-      [w-4 (amb "slowly" "quickly")])
-  (define (joins? left right)
-    (equal?
-     (string-ref left (sub1 (string-length left)))
-     (string-ref right 0)))
-  (unless (joins? w-1 w-2) (amb))
-  (unless (joins? w-2 w-3) (amb))
-  (unless (joins? w-3 w-4) (amb))
-  (list w-1 w-2 w-3 w-4))
+  (let ([w-1 (amb "the" "that" "a")]
+        [w-2 (amb "frog" "elephant" "thing")]
+        [w-3 (amb "walked" "treaded" "grows")]
+        [w-4 (amb "slowly" "quickly")])
+    (define (joins? left right)
+      (equal?
+       (string-ref left (sub1 (string-length left)))
+       (string-ref right 0)))
+    (unless (joins? w-1 w-2) (amb))
+    (unless (joins? w-2 w-3) (amb))
+    (unless (joins? w-3 w-4) (amb))
+    (list w-1 w-2 w-3 w-4)))
 ]
