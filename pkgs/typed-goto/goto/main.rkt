@@ -1,6 +1,7 @@
-#lang typed/racket/base/optional
+#lang typed/racket/base/shallow
 
-(require "private/types.rkt")
+(define-type (Goto a) (∪ a (→ a Nothing)))
+(define-type Label (Goto Label))
 (provide Goto Label)
 
 (require/typed/provide goto/no-check
