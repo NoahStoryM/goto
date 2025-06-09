@@ -99,10 +99,10 @@ Is the fixed point of @racket[Goto].
 @racketblock[
 (define (call/cc proc)
   (define tag 0)
-  (define k (call-with-values cc const*))
+  (define ret (call-with-values cc const*))
   (case/eq tag
-    [(0) (set! tag 1) (proc (k))]
-    [(1) (k)]))
+    [(0) (set! tag 1) (proc (ret))]
+    [(1) (ret)]))
 ]
 
 @subsection{Light-Weight Process}
