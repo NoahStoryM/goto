@@ -1,7 +1,7 @@
 #lang typed/racket/base/shallow
 
 (define-type (Goto a) (∪ a (→ a Nothing)))
-(define-type Label (Goto Label))
+(define-type Label (→ Label Nothing))
 (provide Goto Label)
 
 (require/typed/provide goto/no-check
