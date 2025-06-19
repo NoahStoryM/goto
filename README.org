@@ -3,17 +3,65 @@
 #+EMAIL: noahstorym@gmail.com
 
 * Table of Contents                                       :TOC_5_gh:noexport:
-- [[#raco-pkg-install-goto][raco pkg install goto]]
-- [[#raco-pkg-install-typed-goto][raco pkg install typed-goto]]
+- [[#overview][Overview]]
+- [[#installation][Installation]]
+- [[#usage][Usage]]
+- [[#typed-interface][Typed Interface]]
+- [[#examples][Examples]]
 
-* raco pkg install goto
+* Overview
+
+This repository provides a minimal /goto/ facility implemented using
+[[https://docs.racket-lang.org/reference/cont.html#%28form._%28%28lib._racket%2Fcontinuation..rkt%29._call%2Fcc%29%29][call/cc]].  Two bindings are exported:
+
+- =label=: captures the current continuation and returns it as a value.
+- =goto=: invokes a previously captured continuation.
+
+A separate @racket[typed/goto] collection exposes the same interface for
+Typed Racket programs.
+
+* Installation
+
+Use =raco pkg install= to add the packages from this repository:
+
+#+begin_src bash
+raco pkg install goto
+raco pkg install typed-goto   ; optional
+#+end_src
+
+* Usage
+
+After installation require the library and use =label= and =goto= to jump
+between points in your program.
 
 #+begin_src racket
 (require goto)
+
+(define loop (label))
+(displayln "hello")
+(goto loop) ; prints forever
 #+end_src
 
-* raco pkg install typed-goto
+* Typed Interface
+
+The =typed-goto= package provides the same API for Typed Racket.  Require
+@racket[typed/goto] instead of @racket[goto].
 
 #+begin_src racket
 (require typed/goto)
+
+(: factorial (Integer -> Integer))
+(define (factorial n)
+  (define result : Integer 1)
+  (define loop (label))
+  (unless (zero? n)
+    (set! result (* result n))
+    (set! n (sub1 n))
+    (goto loop))
+  result)
 #+end_src
+
+* Examples
+
+For more examples including light-weight processes and the Yin–Yang
+puzzle, see the documentation in =scribblings/goto.scrbl=.
