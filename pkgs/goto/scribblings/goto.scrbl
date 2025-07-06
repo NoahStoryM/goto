@@ -100,7 +100,7 @@ Is the fixed point of @racket[Goto].
 (define (call/cc proc)
   (define tag 0)
   (define ret (call-with-values cc const*))
-  (case/eq tag
+  (case/eqv tag
     [(0) (set! tag 1) (proc (ret))]
     [(1) (ret)]))
 ]
@@ -115,7 +115,7 @@ Is the fixed point of @racket[Goto].
   (define (lwp-enqueue! break continue)
     (define first? #t)
     (define l (label))
-    (case/eq first?
+    (case/eqv first?
       [(#t)
        (set! first? #f)
        (enqueue! lwp-queue l)
