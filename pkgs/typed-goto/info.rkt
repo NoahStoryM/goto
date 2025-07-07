@@ -6,7 +6,7 @@
 
 (define pkg-desc "Typed goto based on call/cc")
 
-(define deps '("base" "typed-racket-lib" ["goto" #:version "1.0"]))
+(define deps '("base" "typed-racket-lib" "rackunit-typed" ["goto" #:version "1.0"]))
 (define implies '("goto"))
 
 (define clean '("compiled" "private/compiled"))
