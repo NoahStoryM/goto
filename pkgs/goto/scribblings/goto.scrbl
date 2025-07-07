@@ -54,6 +54,8 @@ The @racket[cc] binding is an alias for @racket[current-continuation].
 }
 
 @deftypeconstr[(Goto a)]{
+Represents the law of the excluded middle: @math{a ∨ ¬a}.
+
 @racketblock[
 (define-type (Goto a) (∪ a (→ a Nothing)))
 ]
