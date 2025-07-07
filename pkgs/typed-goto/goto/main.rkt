@@ -5,7 +5,7 @@
 (provide Goto Label)
 
 (require/typed/provide goto/no-check
-  [label (∀ (a ...) (→* () (Prompt-TagTop) (→ a ... Nothing)))]
+  [label (∀ (a) (→* () (Prompt-TagTop) (Goto a)))]
   [goto Label]
-  [current-continuation (∀ (a ...) (case→ (→ (→ a ... Nothing)) (→ Label Nothing)))])
+  [current-continuation (∀ (a) (case→ (→ (Goto a)) (→ Label Nothing)))])
 (provide (rename-out [current-continuation cc]))
