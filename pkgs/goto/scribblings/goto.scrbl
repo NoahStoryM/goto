@@ -98,11 +98,11 @@ Is the fixed point of @racket[Goto].
 
 @racketblock[
 (define (call/cc proc)
-  (define tag 0)
-  (define ret (call-with-values cc const*))
-  (case/eqv tag
-    [(0) (set! tag 1) (proc (ret))]
-    [(1) (ret)]))
+  (define (dispatcher k . v*)
+    (if k
+        (proc (curry k #f))
+        (apply values v*)))
+  (call-with-values cc dispatcher))
 ]
 
 @subsection{Light-Weight Process}
