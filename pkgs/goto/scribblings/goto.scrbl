@@ -107,6 +107,15 @@ Is the fixed point of @racket[Goto].
   (call-with-values cc dispatcher))
 ]
 
+@racketblock[
+(define (call/cc proc)
+  (define v* #f)
+  (define l (label))
+  (if v*
+      (apply values v*)
+      (proc (λ vs (set! v* vs) (goto l)))))
+]
+
 @subsection{Light-Weight Process}
 
 @racketblock[
