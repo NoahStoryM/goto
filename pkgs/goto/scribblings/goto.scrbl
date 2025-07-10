@@ -98,10 +98,10 @@ Is the fixed point of @racket[Goto].
 
 @racketblock[
 (let* ([k #f] [k0 (label)])
-  (unless k (set! k k0))
+  (unless k (set! k k0) (goto k))
   (display #\@)
   (let* ([kn k] [kn+1 (label)])
-    (when (eq? kn k) (set! k kn+1))
+    (when (eq? kn k) (set! k kn+1) (goto k))
     (display #\*)
     (goto kn)))
 ]
