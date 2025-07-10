@@ -96,6 +96,16 @@ Is the fixed point of @racket[Goto].
  (begin0 (cc) (display #\*)))
 ]
 
+@racketblock[
+(let* ([k #f] [k0 (label)])
+  (unless k (set! k k0))
+  (display #\@)
+  (let* ([kn k] [kn+1 (label)])
+    (when (eq? kn k) (set! k kn+1))
+    (display #\*)
+    (goto kn)))
+]
+
 @subsection{Call with Current Continuation}
 
 @racketblock[
