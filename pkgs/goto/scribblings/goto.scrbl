@@ -38,19 +38,21 @@ Gets current continuation.
 ]
 }
 
-@defproc*[([(current-continuation) continuation?]
+@defproc*[([(current-continuation [prompt-tag continuation-prompt-tag? (default-continuation-prompt-tag)]) continuation?]
            [(current-continuation [k continuation?]) none/c])]{
 @racketblock[
 (define current-continuation
   (case-λ
     [() (label)]
-    [(k) (goto k)]))
+    [(v) (if (continuation-prompt-tag? v)
+             (label v)
+             (goto v))]))
 ]
 }
 
-@defproc*[([(cc) continuation?]
+@defproc*[([(cc [prompt-tag continuation-prompt-tag? (default-continuation-prompt-tag)]) continuation?]
            [(cc [k continuation?]) none/c])]{
-The @racket[cc] binding is an alias for @racket[current-continuation].
+Is an alias for @racket[current-continuation].
 }
 
 @deftypeconstr[(Goto a)]{

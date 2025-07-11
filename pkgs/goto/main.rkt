@@ -1,14 +1,18 @@
 #lang racket/base
 
-(require racket/contract/base
-         (contract-in "no-check.rkt"
-                      [label (->* () (continuation-prompt-tag?) any)]
-                      (rename cc goto (-> continuation? none/c))
-                      [current-continuation (case-> (-> any) (-> continuation? none/c))]))
+(provide goto label current-continuation (rename-out [current-continuation cc]))
 
-(define goto* (let/cc return (goto (call/cc return))))
+(define current-continuation
+  (case-λ
+   [() (label)]
+   [(v) (if (continuation-prompt-tag? v)
+            (label v)
+            (goto* 'current-continuation v))]))
 
-(provide label
-         current-continuation
-         (rename-out [current-continuation cc])
-         (contract-out (rename goto* goto continuation?)))
+(define (goto* name k)
+  (if (continuation? k)
+      (raise-result-error name "none/c" (k k))
+      (raise-argument-error name "continuation?" k)))
+(define goto (let/cc return (goto* 'goto (call/cc return))))
+(define (label [prompt-tag (default-continuation-prompt-tag)])
+  (call/cc values prompt-tag))

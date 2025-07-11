@@ -4,8 +4,8 @@
 (define-type Label (→ Label Nothing))
 (provide Goto Label)
 
-(require/typed/provide goto/no-check
+(require/typed/provide goto
   [label (∀ (a) (→* () (Prompt-TagTop) (Goto a)))]
   [goto Label]
-  [current-continuation (∀ (a) (case→ (→ (Goto a)) (→ Label Nothing)))])
+  [current-continuation (∀ (a) (case→ (→* () (Prompt-TagTop) (Goto a)) (→ Label Nothing)))])
 (provide (rename-out [current-continuation cc]))
