@@ -4,10 +4,10 @@
 
 (define current-continuation
   (case-λ
-   [() (label)]
-   [(v) (if (continuation-prompt-tag? v)
-            (label v)
-            (goto* 'current-continuation v))]))
+    [() (label)]
+    [(v) (if (continuation-prompt-tag? v)
+             (label v)
+             (goto* 'current-continuation v))]))
 
 (define (goto* name k)
   (if (continuation? k)
