@@ -41,12 +41,10 @@ Gets current continuation.
 @defproc*[([(current-continuation [prompt-tag continuation-prompt-tag? (default-continuation-prompt-tag)]) continuation?]
            [(current-continuation [k continuation?]) none/c])]{
 @racketblock[
-(define current-continuation
-  (case-λ
-    [() (label)]
-    [(v) (if (continuation-prompt-tag? v)
-             (label v)
-             (goto v))]))
+(define (current-continuation [v (default-continuation-prompt-tag)])
+  (if (continuation-prompt-tag? v)
+      (label v)
+      (goto* 'current-continuation v)))
 ]
 }
 
