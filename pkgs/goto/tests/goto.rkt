@@ -5,6 +5,8 @@
 
 (displayln 'Start)
 
+(check-pred continuation? goto)
+
 (test-begin
   (define x 0)
   (define loop (label))
