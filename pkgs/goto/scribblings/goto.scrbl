@@ -44,7 +44,7 @@ Gets current continuation.
 (define (current-continuation [v (default-continuation-prompt-tag)])
   (if (continuation-prompt-tag? v)
       (label v)
-      (goto* 'current-continuation v)))
+      (goto v)))
 ]
 }
 
