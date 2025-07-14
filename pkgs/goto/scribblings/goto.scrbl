@@ -84,16 +84,11 @@ Is the fixed point of @racket[Goto].
 @subsection{Yin-Yang Puzzle}
 
 @racketblock[
-(let ([yin (current-continuation)])
+(let ([kn (current-continuation)])
   (display #\@)
-  (let ([yang (current-continuation)])
+  (let ([kn+1 (current-continuation)])
     (display #\*)
-    (yin yang)))
-]
-
-@racketblock[
-((begin0 (cc) (display #\@))
- (begin0 (cc) (display #\*)))
+    (kn kn+1)))
 ]
 
 @racketblock[
@@ -104,6 +99,16 @@ Is the fixed point of @racket[Goto].
     (when (eq? kn k) (set! k kn+1) (goto k))
     (display #\*)
     (goto kn)))
+]
+
+@racketblock[
+(define (k0 kn)
+  (display #\@)
+  (define (kn+1 k)
+    (display #\*)
+    (kn k))
+  (kn+1 kn+1))
+(k0 k0)
 ]
 
 @subsection{Call with Current Continuation}
