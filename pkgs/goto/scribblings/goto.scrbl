@@ -53,19 +53,17 @@ Gets current continuation.
 Is an alias for @racket[current-continuation].
 }
 
-@deftypeconstr[(Goto a)]{
-Represents the law of the excluded middle: @math{a ∨ ¬a}.
-
+@deftypeconstr[(¬ a)]{
 @racketblock[
-(define-type (Goto a) (∪ a (→ a Nothing)))
+(define-type (¬ a) (→ a Nothing))
 ]
 }
 
 @deftype[Label]{
-Is the fixed point of @racket[Goto].
+Is the fixed point of @racket[¬].
 
 @racketblock[
-(define-type Label (Goto Label))
+(define-type Label (¬ Label))
 ]
 }
 

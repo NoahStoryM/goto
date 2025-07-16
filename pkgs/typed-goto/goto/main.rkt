@@ -1,11 +1,11 @@
 #lang typed/racket/base/shallow
 
-(define-type (Goto a) (∪ a (→ a Nothing)))
-(define-type Label (→ Label Nothing))
-(provide Goto Label)
+(define-type (¬ a) (→ a Nothing))
+(define-type Label (¬ Label))
+(provide ¬ Label)
 
 (require/typed/provide goto
-  [label (∀ (a) (→* () (Prompt-TagTop) (Goto a)))]
+  [label (∀ (a) (→* () (Prompt-TagTop) (∪ a (¬ a))))]
   [goto Label]
-  [current-continuation (∀ (a) (case→ (→* () (Prompt-TagTop) (Goto a)) (→ Label Nothing)))])
+  [current-continuation (∀ (a) (case→ (→* () (Prompt-TagTop) (∪ a (¬ a))) (→ Label Nothing)))])
 (provide (rename-out [current-continuation cc]))
