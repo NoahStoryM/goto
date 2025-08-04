@@ -139,7 +139,7 @@ Is the fixed point of @racket[¬].
   (define (lwp-enqueue! break continue)
     (define first? #t)
     (define l (label))
-    (case/eqv first?
+    (case/eq first?
       [(#t)
        (set! first? #f)
        (enqueue! lwp-queue l)
