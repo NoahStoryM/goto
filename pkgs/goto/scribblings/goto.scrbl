@@ -175,6 +175,8 @@ Is the fixed point of @racket[¬].
     (set! alt* (cdr alt*))
     (when (null? alt*)
       (set! task* (cdr task*)))
+    (when (eq? alt amb*)
+      (goto task))
     (alt))
   (define-syntax-rule (amb exp* ...) (amb* (λ () exp*) ...))
 
