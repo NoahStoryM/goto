@@ -1,52 +1,12 @@
-#+TITLE: Goto based on call/cc
+#+TITLE: Goto
 #+AUTHOR: Noah Ma
 #+EMAIL: noahstorym@gmail.com
 
 * Table of Contents                                       :TOC_5_gh:noexport:
-- [[#overview][Overview]]
-- [[#installation][Installation]]
-- [[#usage][Usage]]
-- [[#typed-interface][Typed Interface]]
+- [[#raco-pkg-install-goto][raco pkg install goto]]
 
-* Overview
-This repository provides a minimal /goto/ facility implemented using =call/cc=.
-Two bindings are exported:
-
-- =label=: captures the current continuation and returns it as a value.
-- =goto=: invokes a previously captured continuation.
-
-A separate =typed/goto= collection exposes the same interface for
-Typed Racket programs.
-
-For more examples, see the documentation in =pkgs/goto/scribblings/goto.scrbl=.
-
-* Installation
-Use =raco pkg install= to add the packages from this repository:
-
-#+begin_src bash
-raco pkg install goto
-raco pkg install typed-goto
-#+end_src
-
-* Usage
-After installation require the library and use =label= and =goto= to jump
-between points in your program.
+* raco pkg install goto
 
 #+begin_src racket
 (require goto)
-
-(define loop (label))
-(displayln "hello")
-(goto loop) ; prints forever
-#+end_src
-
-* Typed Interface
-The =typed-goto= package provides the same API for Typed Racket.
-
-#+begin_src racket
-(require typed/goto)
-
-(define loop (label))
-(displayln "hello")
-(goto loop) ; prints forever
 #+end_src

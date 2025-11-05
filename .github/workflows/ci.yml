@@ -12,6 +12,6 @@ jobs:
         with:
           version: "stable"
       - name: Install packages
-        run: raco pkg install --auto pkgs/goto pkgs/typed-goto
+        run: raco pkg install --auto
       - name: Run tests
-        run: raco test -p goto typed-goto
+        run: raco test -p goto

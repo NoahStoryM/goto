@@ -5,13 +5,13 @@
                      racket/contract/base
                      racket/function
                      racket/sequence
+                     (only-in typed/racket/base define-type → Nothing)
                      data/queue
                      goto)
           "utils.rkt")
 
 @title{Goto}
-@defmodule[goto       #:packages ("goto")]
-@defmodule[typed/goto #:packages ("typed-goto") #:no-declare]
+@defmodule[goto #:packages ("goto")]
 @author[@author+email["Noah Ma" "noahstorym@gmail.com"]]
 
 @section{Overview}

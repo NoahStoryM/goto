@@ -1,6 +1,6 @@
 #lang racket/base
 
-(provide goto label current-continuation (rename-out [current-continuation cc]))
+(provide goto label current-continuation)
 
 (define (goto* name k)
   (if (continuation? k)
