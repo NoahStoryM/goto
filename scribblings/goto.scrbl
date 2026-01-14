@@ -54,9 +54,18 @@ Gets current continuation.
 Is an alias for @racket[current-continuation].
 }
 
+
+@deftype[⊥]{
+Is an alias for @racket[Nothing].
+
+@racketblock[
+(define-type ⊥ Nothing)
+]
+}
+
 @deftypeconstr[(¬ a)]{
 @racketblock[
-(define-type (¬ a) (→ a Nothing))
+(define-type (¬ a) (→ a ⊥))
 ]
 }
 
