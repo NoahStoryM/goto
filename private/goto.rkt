@@ -3,9 +3,9 @@
 (provide goto label current-continuation)
 
 (define (goto* name k [v k])
-  (if (continuation? k)
+  (if (procedure? k)
       (raise-result-error name "none/c" (k v))
-      (raise-argument-error name "continuation?" k)))
+      (raise-argument-error name "(-> any/c none/c)" k)))
 
 (define (goto k [v k]) (goto* 'goto k v))
 (define (label [prompt-tag (default-continuation-prompt-tag)])

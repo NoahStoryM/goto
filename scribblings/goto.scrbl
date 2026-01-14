@@ -21,7 +21,7 @@ This package provides @racket[label] and @racket[goto] constructs that simulate
 
 @section{API Reference}
 
-@defproc[(goto [k continuation?] [v any/c k]) none/c]{
+@defproc[(goto [k (-> any/c none/c)] [v any/c k]) none/c]{
 Sets current continuation.
 
 @racketblock[
@@ -39,7 +39,7 @@ Gets current continuation.
 }
 
 @defproc*[([(current-continuation [prompt-tag continuation-prompt-tag? (default-continuation-prompt-tag)]) any/c]
-           [(current-continuation [k continuation?] [v any/c k]) none/c])]{
+           [(current-continuation [k (-> any/c none/c)] [v any/c k]) none/c])]{
 @racketblock[
 (define current-continuation
   (case-λ
@@ -50,7 +50,7 @@ Gets current continuation.
 }
 
 @defproc*[([(cc [prompt-tag continuation-prompt-tag? (default-continuation-prompt-tag)]) any/c]
-           [(cc [k continuation?] [v any/c k]) none/c])]{
+           [(cc [k (-> any/c none/c)] [v any/c k]) none/c])]{
 Is an alias for @racket[current-continuation].
 }
 
