@@ -2,16 +2,19 @@
 
 (provide goto label current-continuation)
 
-(define (goto* name k)
+(define (goto* name k [v k])
   (if (continuation? k)
-      (raise-result-error name "none/c" (k k))
+      (raise-result-error name "none/c" (k v))
       (raise-argument-error name "continuation?" k)))
 
-(define goto (let/cc return (goto* 'goto (call/cc return))))
+(define (goto k [v k]) (goto* 'goto k v))
 (define (label [prompt-tag (default-continuation-prompt-tag)])
   (call/cc values prompt-tag))
 
-(define (current-continuation [v (default-continuation-prompt-tag)])
-  (if (continuation-prompt-tag? v)
-      (label v)
-      (goto* 'current-continuation v)))
+(define current-continuation
+  (case-λ
+    [() (label)]
+    [(v) (if (continuation-prompt-tag? v)
+             (label v)
+             (goto* 'current-continuation v))]
+    [(k v) (goto* 'current-continuation k v)]))

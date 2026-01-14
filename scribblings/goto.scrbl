@@ -21,15 +21,15 @@ This package provides @racket[label] and @racket[goto] constructs that simulate
 
 @section{API Reference}
 
-@defproc[(goto [k continuation?]) none/c]{
+@defproc[(goto [k continuation?] [v any/c k]) none/c]{
 Sets current continuation.
 
 @racketblock[
-(define (goto k) (k k))
+(define (goto k [v k]) (k v))
 ]
 }
 
-@defproc[(label [prompt-tag continuation-prompt-tag? (default-continuation-prompt-tag)]) continuation?]{
+@defproc[(label [prompt-tag continuation-prompt-tag? (default-continuation-prompt-tag)]) any/c]{
 Gets current continuation.
 
 @racketblock[
@@ -38,18 +38,19 @@ Gets current continuation.
 ]
 }
 
-@defproc*[([(current-continuation [prompt-tag continuation-prompt-tag? (default-continuation-prompt-tag)]) continuation?]
-           [(current-continuation [k continuation?]) none/c])]{
+@defproc*[([(current-continuation [prompt-tag continuation-prompt-tag? (default-continuation-prompt-tag)]) any/c]
+           [(current-continuation [k continuation?] [v any/c k]) none/c])]{
 @racketblock[
-(define (current-continuation [v (default-continuation-prompt-tag)])
-  (if (continuation-prompt-tag? v)
-      (label v)
-      (goto v)))
+(define current-continuation
+  (case-λ
+    [() (label)]
+    [(v) (if (continuation-prompt-tag? v) (label v) (goto v))]
+    [(k v) (goto k v)]))
 ]
 }
 
-@defproc*[([(cc [prompt-tag continuation-prompt-tag? (default-continuation-prompt-tag)]) continuation?]
-           [(cc [k continuation?]) none/c])]{
+@defproc*[([(cc [prompt-tag continuation-prompt-tag? (default-continuation-prompt-tag)]) any/c]
+           [(cc [k continuation?] [v any/c k]) none/c])]{
 Is an alias for @racket[current-continuation].
 }
 
@@ -82,11 +83,11 @@ Is the fixed point of @racket[¬].
 @subsection{Yin-Yang Puzzle}
 
 @racketblock[
-(let ([kn (current-continuation)])
+(let ([kn (label)])
   (display #\@)
-  (let ([kn+1 (current-continuation)])
+  (let ([kn+1 (label)])
     (display #\*)
-    (kn kn+1)))
+    (goto kn kn+1)))
 ]
 
 @racketblock[

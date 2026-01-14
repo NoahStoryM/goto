@@ -6,6 +6,10 @@
 
 (require/typed/provide "private/goto.rkt"
   [label (∀ (a) (→* () (Prompt-TagTop) (∪ a (¬ a))))]
-  [goto Label]
-  [current-continuation (∀ (a) (case→ (→* () (Prompt-TagTop) (∪ a (¬ a))) (→ Label Nothing)))])
+  [goto (∀ (a) (case→ (→ Label Nothing) (→ (¬ a) a Nothing)))]
+  [current-continuation
+   (∀ (a)
+      (case→ (→* () (Prompt-TagTop) (∪ a (¬ a)))
+             (→ Label Nothing)
+             (→ (¬ a) a Nothing)))])
 (provide (rename-out [current-continuation cc]))
