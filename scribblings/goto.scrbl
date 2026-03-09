@@ -122,18 +122,18 @@ Is the fixed point of @racket[¬].
 @subsection{Call with Current Continuation}
 
 @racketblock[
-(define (call/cc proc)
+(define (call/cc proc [prompt-tag (default-continuation-prompt-tag)])
   (define (dispatcher k . v*)
     (if k
         (proc (curry k #f))
         (apply values v*)))
-  (call-with-values cc dispatcher))
+  (call-with-values (curry cc prompt-tag) dispatcher))
 ]
 
 @racketblock[
-(define (call/cc proc)
+(define (call/cc proc [prompt-tag (default-continuation-prompt-tag)])
   (define v* #f)
-  (define l (label))
+  (define l (label prompt-tag))
   (if v*
       (apply values v*)
       (proc (λ vs (set! v* vs) (goto l)))))
