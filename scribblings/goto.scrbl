@@ -123,11 +123,10 @@ Is the fixed point of @racket[¬].
 
 @racketblock[
 (define (call/cc proc [prompt-tag (default-continuation-prompt-tag)])
-  (define (dispatcher k . v*)
-    (if k
-        (proc (curry k #f))
-        (apply values v*)))
-  (call-with-values (curry cc prompt-tag) dispatcher))
+  (define v* (label prompt-tag))
+  (if (list? v*)
+      (apply values v*)
+      (proc (λ vs (goto v* vs)))))
 ]
 
 @racketblock[
