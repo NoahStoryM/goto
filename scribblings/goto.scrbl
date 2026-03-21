@@ -1,7 +1,6 @@
 #lang scribble/manual
 
 @(require (for-label racket/base
-                     racket/case
                      racket/contract/base
                      racket/function
                      racket/sequence
@@ -142,26 +141,22 @@ Is the fixed point of @racket[¬].
 
 @racketblock[
 (let ([lwp-queue (make-queue)])
+  (define (lwp thk)
+    (enqueue! lwp-queue thk))
   (define (start)
     (when (non-empty-queue? lwp-queue)
-      (goto (dequeue! lwp-queue))))
-  (define (lwp-enqueue! break continue)
-    (define first? #t)
+      ((dequeue! lwp-queue))))
+  (define (pause)
     (define l (label))
-    (case/eq first?
-      [(#t)
-       (set! first? #f)
-       (enqueue! lwp-queue l)
-       (break)]
-      [(#f) (continue)]))
-  (define (pause) (lwp-enqueue! start void))
-  (define (lwp thk) (lwp-enqueue! void (λ () (thk) (start))))
+    (when l
+      (enqueue! lwp-queue (λ () (goto l #f)))
+      (start)))
 
-  (lwp (λ () (goto (begin0 (label) (pause) (display #\h)))))
-  (lwp (λ () (goto (begin0 (label) (pause) (display #\e)))))
-  (lwp (λ () (goto (begin0 (label) (pause) (display #\y)))))
-  (lwp (λ () (goto (begin0 (label) (pause) (display #\!)))))
-  (lwp (λ () (goto (begin0 (label) (pause) (newline)    ))))
+  (lwp (λ () (let f () (pause) (display #\h) (f))))
+  (lwp (λ () (let f () (pause) (display #\e) (f))))
+  (lwp (λ () (let f () (pause) (display #\y) (f))))
+  (lwp (λ () (let f () (pause) (display #\!) (f))))
+  (lwp (λ () (let f () (pause) (newline)     (f))))
   (start))
 ]
 
@@ -172,20 +167,14 @@ Is the fixed point of @racket[¬].
   (define (fail)
     (if (null? task*)
         (error "Amb tree exhausted")
-        (goto (car task*))))
+        (goto (car task*) #f)))
   (define (amb* . alt*)
-    (define first? #t)
     (define task (label))
     (when (null? alt*) (fail))
-    (when first?
-      (set! first? #f)
-      (set! task* (cons task task*)))
+    (when task (set! task* (cons task task*)))
     (define alt (car alt*))
     (set! alt* (cdr alt*))
-    (when (null? alt*)
-      (set! task* (cdr task*)))
-    (when (eq? alt amb*)
-      (goto task))
+    (when (null? alt*) (set! task* (cdr task*)))
     (alt))
   (define-syntax-rule (amb exp* ...) (amb* (λ () exp*) ...))
 
