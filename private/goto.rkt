@@ -14,7 +14,9 @@
 (define current-continuation
   (case-λ
     [() (label)]
-    [(v) (if (continuation-prompt-tag? v)
-             (label v)
-             (goto* 'current-continuation v))]
+    [(v)
+     (cond
+       [(continuation-prompt-tag? v) (label v)]
+       [(procedure? v) (raise-result-error 'current-continuation "none/c" (v v))]
+       [else (raise-argument-error 'current-continuation "(or/c continuation-prompt-tag? (-> any/c none/c))" v)])]
     [(k v) (goto* 'current-continuation k v)]))
