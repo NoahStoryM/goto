@@ -33,7 +33,7 @@ Gets current continuation.
 
 @racketblock[
 (define (label [prompt-tag (default-continuation-prompt-tag)])
-  (call/cc goto prompt-tag))
+  (call/cc values prompt-tag))
 ]
 }
 
