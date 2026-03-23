@@ -10,3 +10,5 @@
 #+begin_src racket
 (require goto)
 #+end_src
+
+The =goto= library re-exports =control/context= for backward compatibility.
