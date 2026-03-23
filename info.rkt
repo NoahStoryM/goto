@@ -2,7 +2,7 @@
 
 (define license 'MIT)
 (define collection "goto")
-(define version "1.1")
+(define version "1.2")
 
 (define pkg-desc "Goto based on call/cc")
 

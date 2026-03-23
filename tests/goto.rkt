@@ -21,3 +21,15 @@
     (set! n (sub1 n))
     (goto loop))
   (check-eqv? result 120))
+
+(test-begin
+  (define (mul . r*)
+    (define return (cc))
+    (if (continuation? return)
+        (for/fold ([result 1])
+                  ([r (in-list r*)])
+          (if (zero? r)
+              (return r)
+              (* result r)))
+        return))
+  (check-eqv? (mul 3 4 10) 120))

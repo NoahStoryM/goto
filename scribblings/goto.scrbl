@@ -15,41 +15,37 @@
 
 @section{Overview}
 
-This package provides @racket[label] and @racket[goto] constructs that simulate
-@deftech{jump} using @racket[call/cc].
+This package provides @racket[label] and @racket[goto] constructs that
+simulate @deftech{jump} using @racket[call/cc].
 
 @section{API Reference}
 
 @defproc[(goto [k (-> any/c none/c)] [v any/c k]) none/c]{
-Sets current continuation.
-
 @racketblock[
 (define (goto k [v k]) (k v))
 ]
 }
 
 @defproc[(label [prompt-tag continuation-prompt-tag? (default-continuation-prompt-tag)]) any/c]{
-Gets current continuation.
-
 @racketblock[
 (define (label [prompt-tag (default-continuation-prompt-tag)])
-  (call/cc values prompt-tag))
+  (call/cc goto prompt-tag))
 ]
 }
 
 @defproc*[([(current-continuation [prompt-tag continuation-prompt-tag? (default-continuation-prompt-tag)]) any/c]
-           [(current-continuation [k (-> any/c none/c)] [v any/c k]) none/c])]{
+           [(current-continuation [k (-> any/c ... none/c)] [v any/c] ...) none/c])]{
 @racketblock[
 (define current-continuation
   (case-λ
-    [() (label)]
-    [(v) (if (continuation-prompt-tag? v) (label v) (goto v))]
-    [(k v) (goto k v)]))
+    [() (call/cc values)]
+    [(p) (if (continuation-prompt-tag? p) (call/cc values p) (p))]
+    [(k . v*) (apply k v*)]))
 ]
 }
 
 @defproc*[([(cc [prompt-tag continuation-prompt-tag? (default-continuation-prompt-tag)]) any/c]
-           [(cc [k (-> any/c none/c)] [v any/c k]) none/c])]{
+           [(cc [k (-> any/c ... none/c)] [v any/c] ...) none/c])]{
 Is an alias for @racket[current-continuation].
 }
 
@@ -76,6 +72,14 @@ Is the fixed point of @racket[¬].
 ]
 }
 
+@deftypeconstr[(LEM a)]{
+Is the Law of Excluded Middle.
+
+@racketblock[
+(define-type (LEM a) (∪ a (¬ a)))
+]
+}
+
 @section{Examples}
 
 @subsection{Loop}
@@ -88,14 +92,60 @@ Is the fixed point of @racket[¬].
   (displayln x))
 ]
 
+@subsection{Return}
+
+@racketblock[
+(define (mul . r*)
+  (call/cc
+   (λ (return)
+     (for/fold ([result (*)])
+               ([r (in-list r*)])
+       (if (zero? r)
+           (return r)
+           (* result r))))))
+]
+
+@racketblock[
+(define (mul . r*)
+  (define return (cc))
+  (if (continuation? return)
+      (for/fold ([result (*)])
+                ([r (in-list r*)])
+        (if (zero? r)
+            (return r)
+            (* result r)))
+      return))
+]
+
+@racketblock[
+(define (mul . r*)
+  (define first? #t)
+  (define result (*))
+  (define l (label))
+  (when first?
+    (set! first? #f)
+    (for ([r (in-list r*)])
+      (when (zero? r)
+        (set! result r)
+        (goto l))
+      (set! result (* result r))))
+  result)
+]
+
 @subsection{Yin-Yang Puzzle}
 
 @racketblock[
-(let ([kn (label)])
+(let* ([kn   ((λ (k) (display #\@) k) (call/cc (λ (k) k)))]
+       [kn+1 ((λ (k) (display #\*) k) (call/cc (λ (k) k)))])
+  (kn kn+1))
+]
+
+@racketblock[
+(let ([kn (cc)])
   (display #\@)
-  (let ([kn+1 (label)])
+  (let ([kn+1 (cc)])
     (display #\*)
-    (goto kn kn+1)))
+    (cc kn kn+1)))
 ]
 
 @racketblock[
@@ -122,10 +172,10 @@ Is the fixed point of @racket[¬].
 
 @racketblock[
 (define (call/cc proc [prompt-tag (default-continuation-prompt-tag)])
-  (define v* (label prompt-tag))
+  (define v* (cc prompt-tag))
   (if (list? v*)
       (apply values v*)
-      (proc (λ vs (goto v* vs)))))
+      (proc (λ vs (cc v* vs)))))
 ]
 
 @racketblock[
@@ -147,9 +197,30 @@ Is the fixed point of @racket[¬].
     (when (non-empty-queue? lwp-queue)
       ((dequeue! lwp-queue))))
   (define (pause)
-    (define l (label))
-    (when l
-      (enqueue! lwp-queue (λ () (goto l #f)))
+    (call/cc
+     (λ (k)
+       (enqueue! lwp-queue (λ () (k #f)))
+       (start))))
+
+  (lwp (λ () (let f () (pause) (display #\h) (f))))
+  (lwp (λ () (let f () (pause) (display #\e) (f))))
+  (lwp (λ () (let f () (pause) (display #\y) (f))))
+  (lwp (λ () (let f () (pause) (display #\!) (f))))
+  (lwp (λ () (let f () (pause) (newline)     (f))))
+  (start))
+]
+
+@racketblock[
+(let ([lwp-queue (make-queue)])
+  (define (lwp thk)
+    (enqueue! lwp-queue thk))
+  (define (start)
+    (when (non-empty-queue? lwp-queue)
+      ((dequeue! lwp-queue))))
+  (define (pause)
+    (define k (cc))
+    (when k
+      (enqueue! lwp-queue (λ () (cc k #f)))
       (start)))
 
   (lwp (λ () (let f () (pause) (display #\h) (f))))
@@ -167,9 +238,9 @@ Is the fixed point of @racket[¬].
   (define (fail)
     (if (null? task*)
         (error "Amb tree exhausted")
-        (goto (car task*) #f)))
+        (cc (car task*) #f)))
   (define (amb* . alt*)
-    (define task (label))
+    (define task (cc))
     (when (null? alt*) (fail))
     (when task (set! task* (cons task task*)))
     (define alt (car alt*))

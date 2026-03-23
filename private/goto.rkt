@@ -2,21 +2,26 @@
 
 (provide goto label current-continuation)
 
-(define (goto* name k [v k])
-  (if (procedure? k)
-      (raise-result-error name "none/c" (k v))
-      (raise-argument-error name "(-> any/c none/c)" k)))
 
-(define (goto k [v k]) (goto* 'goto k v))
+(define (goto k [v k])
+  (if (procedure? k)
+      (raise-result-error 'goto "none/c" (k v))
+      (raise-argument-error 'goto "(-> any/c none/c)" k)))
 (define (label [prompt-tag (default-continuation-prompt-tag)])
   (call/cc values prompt-tag))
 
 (define current-continuation
   (case-λ
-    [() (label)]
-    [(v)
+    [() (call/cc values)]
+    [(p)
      (cond
-       [(continuation-prompt-tag? v) (label v)]
-       [(procedure? v) (raise-result-error 'current-continuation "none/c" (v v))]
-       [else (raise-argument-error 'current-continuation "(or/c continuation-prompt-tag? (-> any/c none/c))" v)])]
-    [(k v) (goto* 'current-continuation k v)]))
+       [(continuation-prompt-tag? p)
+        (call/cc values p)]
+       [(procedure? p)
+        (raise-result-error 'current-continuation "none/c" (p))]
+       [else
+        (raise-argument-error 'current-continuation "(or/c continuation-prompt-tag? (-> any/c none/c))" p)])]
+    [(k v1      ) (raise-result-error 'current-continuation "none/c" (k v1      ))]
+    [(k v1 v2   ) (raise-result-error 'current-continuation "none/c" (k v1 v2   ))]
+    [(k v1 v2 v3) (raise-result-error 'current-continuation "none/c" (k v1 v2 v3))]
+    [(k . v*    ) (raise-result-error 'current-continuation "none/c" (apply k v*))]))
