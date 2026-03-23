@@ -98,23 +98,23 @@ Is the Law of Excluded Middle.
 (define (mul . r*)
   (call/cc
    (λ (return)
-     (for/fold ([result (*)])
+     (for/fold ([res (*)] #:result (return res))
                ([r (in-list r*)])
        (if (zero? r)
            (return r)
-           (* result r))))))
+           (* res r))))))
 ]
 
 @racketblock[
 (define (mul . r*)
-  (define return (cc))
-  (if (continuation? return)
-      (for/fold ([result (*)])
-                ([r (in-list r*)])
-        (if (zero? r)
-            (return r)
-            (* result r)))
-      return))
+  (define result (cc))
+  (when (continuation? result)
+    (for/fold ([res (*)] #:result (result res))
+              ([r (in-list r*)])
+      (if (zero? r)
+          (result r)
+          (* res r))))
+  result)
 ]
 
 @racketblock[
@@ -231,7 +231,62 @@ Is the Law of Excluded Middle.
   (start))
 ]
 
+@racketblock[
+(let ([lwp-queue (make-queue)])
+  (define (lwp thk)
+    (enqueue! lwp-queue thk))
+  (define (start)
+    (when (non-empty-queue? lwp-queue)
+      ((dequeue! lwp-queue))))
+  (define (pause)
+    (define first? #t)
+    (define l (label))
+    (when first?
+      (set! first? #f)
+      (enqueue! lwp-queue (λ () (goto l)))
+      (start)))
+
+  (lwp (λ () (let f () (pause) (display #\h) (f))))
+  (lwp (λ () (let f () (pause) (display #\e) (f))))
+  (lwp (λ () (let f () (pause) (display #\y) (f))))
+  (lwp (λ () (let f () (pause) (display #\!) (f))))
+  (lwp (λ () (let f () (pause) (newline)     (f))))
+  (start))
+]
+
 @subsection{Ambiguous Operator}
+
+@racketblock[
+(let ([task* '()])
+  (define (fail)
+    (if (null? task*)
+        (error "Amb tree exhausted")
+        ((car task*))))
+  (define (amb* . alt*)
+    (call/cc
+     (λ (task)
+       (unless (null? alt*)
+         (set! task* (cons task task*)))))
+    (when (null? alt*) (fail))
+    (define alt (car alt*))
+    (set! alt* (cdr alt*))
+    (when (null? alt*) (set! task* (cdr task*)))
+    (alt))
+  (define-syntax-rule (amb exp* ...) (amb* (λ () exp*) ...))
+
+  (let ([w-1 (amb "the" "that" "a")]
+        [w-2 (amb "frog" "elephant" "thing")]
+        [w-3 (amb "walked" "treaded" "grows")]
+        [w-4 (amb "slowly" "quickly")])
+    (define (joins? left right)
+      (equal?
+       (string-ref left (sub1 (string-length left)))
+       (string-ref right 0)))
+    (unless (joins? w-1 w-2) (amb))
+    (unless (joins? w-2 w-3) (amb))
+    (unless (joins? w-3 w-4) (amb))
+    (list w-1 w-2 w-3 w-4)))
+]
 
 @racketblock[
 (let ([task* '()])
@@ -242,7 +297,41 @@ Is the Law of Excluded Middle.
   (define (amb* . alt*)
     (define task (cc))
     (when (null? alt*) (fail))
-    (when task (set! task* (cons task task*)))
+    (when task
+      (set! task* (cons task task*)))
+    (define alt (car alt*))
+    (set! alt* (cdr alt*))
+    (when (null? alt*) (set! task* (cdr task*)))
+    (alt))
+  (define-syntax-rule (amb exp* ...) (amb* (λ () exp*) ...))
+
+  (let ([w-1 (amb "the" "that" "a")]
+        [w-2 (amb "frog" "elephant" "thing")]
+        [w-3 (amb "walked" "treaded" "grows")]
+        [w-4 (amb "slowly" "quickly")])
+    (define (joins? left right)
+      (equal?
+       (string-ref left (sub1 (string-length left)))
+       (string-ref right 0)))
+    (unless (joins? w-1 w-2) (amb))
+    (unless (joins? w-2 w-3) (amb))
+    (unless (joins? w-3 w-4) (amb))
+    (list w-1 w-2 w-3 w-4)))
+]
+
+@racketblock[
+(let ([task* '()])
+  (define (fail)
+    (if (null? task*)
+        (error "Amb tree exhausted")
+        (goto (car task*))))
+  (define (amb* . alt*)
+    (define first? #t)
+    (define task (label))
+    (when (null? alt*) (fail))
+    (when first?
+      (set! first? #f)
+      (set! task* (cons task task*)))
     (define alt (car alt*))
     (set! alt* (cdr alt*))
     (when (null? alt*) (set! task* (cdr task*)))
