@@ -6,7 +6,9 @@
 
 (define pkg-desc "Goto based on call/cc")
 
-(define deps '("control-context"))
+(define deps '("base"
+               "typed-racket-lib"
+               "control-context"))
 (define build-deps '())
 
 (define clean '("compiled" "private/compiled"))
